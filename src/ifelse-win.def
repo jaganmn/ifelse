@@ -1,0 +1,3 @@
+LIBRARY ifelse.dll
+EXPORTS
+ R_init_ifelse

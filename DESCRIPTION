@@ -1,0 +1,19 @@
+Package: ifelse
+Version: 0.0.1
+Date: 2025-07-11
+Title: 'ifelse' Variants
+Description:
+	Experiments with variants of function 'ifelse' in package 'base'
+	following renewed discussion in the R-devel mailing list
+	<https://stat.ethz.ch/pipermail/r-devel/2025-July/084096.html>.
+License: GPL (>= 2)
+URL: https://github.com/jaganmn/ifelse
+BugReports: https://github.com/jaganmn/ifelse/issues
+Authors@R:
+	c(person("Mikael", "Jagan",
+	         email = "jaganmn@mcmaster.ca",
+	         role = c("aut", "cre"),
+	         comment = c(ORCID = "0000-0002-3542-2938")))
+Depends: R (>= 2.14)
+DependsComment: for Authors@R, almost surely not strict enough
+Imports: methods, stats
