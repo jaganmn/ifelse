@@ -29,13 +29,12 @@ ifelse1(test, yes, no, na = NULL, maybeDotCall = FALSE)
 \value{
   A vector.  The length is the length of \code{test} after coercion to
   logical.  The type and class are what would be the type and class of
-  \code{c(yes, no, na)}, hence promotion occurs according to methods for
-  \code{\link{c}}.  Attributes of \code{test} (including \code{names},
-  \code{dim}, \code{dimnames}, \code{tsp}, \ldots{}, but excluding
-  \code{class}) are preserved but they can be overridden notably if
-  methods for \code{c} preserve attributes; see the examples.  If a
-  \code{tsp} attribute is preserved then the return value will inherit
-  from class \code{\link{ts}} and (if it is a matrix) class \code{mts}.
+  \code{c(yes, no, na)}, hence coercions occur according to methods for
+  \code{\link{c}} (which dispatch on and may give precedence to the
+  class of the first argument \code{yes}).  The \code{\link{names}},
+  \code{\link{dim}}, and \code{\link{dimnames}} of \code{test} are
+  preserved.  Attributes of \code{test} other than \code{names},
+  \code{dim}, and \code{dimnames} are discarded.
 }
 \seealso{\code{\link{if}}, \code{\link{ifelse}}.}
 \examples{

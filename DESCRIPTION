@@ -16,4 +16,4 @@ Authors@R:
 	         comment = c(ORCID = "0000-0002-3542-2938")))
 Depends: R (>= 2.14)
 DependsNote: for Authors@R, almost surely not strict enough
-Imports: methods, stats
+Imports: methods
