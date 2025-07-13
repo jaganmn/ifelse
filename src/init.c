@@ -10,7 +10,7 @@ Rcomplex R_ifelse_NaComplex;
 
 static R_CallMethodDef CallEntries[] =
 {
-	{"R_ifelse_ifelse1", (DL_FUNC) &R_ifelse_ifelse1, 3},
+	{"R_ifelse_ifelse1", (DL_FUNC) &R_ifelse_ifelse1, 4},
 	{NULL, NULL, 0}
 };
 

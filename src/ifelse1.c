@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <Rinternals.h>
 
 #ifndef NA_COMPLEX
@@ -5,8 +6,12 @@ extern Rcomplex R_ifelse_NaComplex;
 # define NA_COMPLEX R_ifelse_NaComplex
 #endif
 
-SEXP R_ifelse_ifelse1(SEXP test, SEXP yes, SEXP no)
+#define imax2(a, b)    ((a < b) ?       b     :       a    )
+#define imax3(a, b, c) ((a < b) ? imax2(b, c) : imax2(a, c))
+
+SEXP R_ifelse_ifelse1(SEXP test, SEXP yes, SEXP no, SEXP na)
 {
+	int withna = na != R_NilValue;
 	if (!Rf_isLogical(test))
 		Rf_error("'%s' [type \"%s\"] is not logical",
 		         "test", Rf_type2char(TYPEOF(test)));
@@ -16,42 +21,50 @@ SEXP R_ifelse_ifelse1(SEXP test, SEXP yes, SEXP no)
 	if (!Rf_isVector(no))
 		Rf_error("'%s' [type \"%s\"] is not a vector",
 		         "no", Rf_type2char(TYPEOF(no)));
-	R_xlen_t nyes = XLENGTH(yes), nno = XLENGTH(no),
-		nans = XLENGTH(test);
-	SEXPTYPE tyes = TYPEOF(yes), tno = TYPEOF(no),
-		tans = (tyes <= tno) ? tno : tyes;
-	PROTECT(yes = Rf_coerceVector(yes, tans));
-	PROTECT( no = Rf_coerceVector( no, tans));
-	SEXP ans = PROTECT(Rf_allocVector(tans, nans));
+	if (withna && !Rf_isVector(na))
+		Rf_error("'%s' [type \"%s\"] is not a vector or NULL",
+		         "na", Rf_type2char(TYPEOF(na)));
+	R_xlen_t nyes = XLENGTH(yes), nno = XLENGTH(no), \
+		nna = (withna) ? XLENGTH(na) : 0, nans = XLENGTH(test);
+	SEXPTYPE tyes = TYPEOF(yes), tno = TYPEOF(no), \
+		tna = TYPEOF(na), tans = imax3(tyes, tno, tna);
+	SEXP ans = PROTECT(Rf_allocVector(tans, nans)),
+		dft = PROTECT(Rf_allocVector(tans, 1));
+	PROTECT(yes = (nyes) ? Rf_coerceVector(yes, tans) : dft);
+	PROTECT(no  = (nno ) ? Rf_coerceVector(no , tans) : dft);
+	PROTECT(na  = (nna ) ? Rf_coerceVector(na , tans) : dft);
 	const int *ptest = LOGICAL_RO(test);
 
-#define mapyes(i) \
-	((nyes == 1) ? 0 : (nyes == nans) ? i : i % nyes)
-#define mapno(i) \
-	((nno == 1) ? 0 : (nno == nans) ? i : i % nno)
-
-#define ifelseAtomic(type, ptr, na) \
+#define IFELSE(get, set, navalue) \
 	do { \
-		type *pyes = ptr(yes), *pno = ptr(no), *pans = ptr(ans); \
-		for (R_xlen_t i = 0; i < nans; ++i) \
-			pans[i] = (ptest[i] == NA_LOGICAL) ? na : ptest[i] ? pyes[mapyes(i)] : pno[mapno(i)]; \
+		set(dft, 0, navalue); \
+		for (R_xlen_t j = 0; j < nans; ++j) \
+			set(ans, j, \
+			    (ptest[j] == NA_LOGICAL) \
+			    ? get(na , (nna  <= 1) ? 0 : j % nna ) : \
+			    (ptest[j]) \
+			    ? get(yes, (nyes <= 1) ? 0 : j % nyes) \
+			    : get(no , (nno  <= 1) ? 0 : j % nno )); \
 	} while (0)
-#define ifelseRecursive(get, set, na) \
+#define IFELSE_ATOMIC(type, ptr, navalue) \
 	do { \
-		for (R_xlen_t i = 0; i < nans; ++i) \
-			set(ans, i, (ptest[i] == NA_LOGICAL) ? na : ptest[i] ? get(yes, mapyes(i)) : get(no, mapno(i))); \
+		type *pyes = ptr(yes), *pno = ptr(no), \
+			*pna = ptr(na), *pans = ptr(ans), *pdft = ptr(dft); \
+		IFELSE(ATOMIC_ELT, SET_ATOMIC_ELT, navalue); \
 	} while (0)
+#define     ATOMIC_ELT(x, i       ) p##x[i]
+#define SET_ATOMIC_ELT(x, i, value) p##x[i] = value
 
 	switch (tans) {
-	case  RAWSXP: ifelseAtomic(   Rbyte,     RAW,          0); break;
-	case  LGLSXP: ifelseAtomic(     int, LOGICAL, NA_LOGICAL); break;
-	case  INTSXP: ifelseAtomic(     int, INTEGER, NA_INTEGER); break;
-	case REALSXP: ifelseAtomic(  double,    REAL,    NA_REAL); break;
-	case CPLXSXP: ifelseAtomic(Rcomplex, COMPLEX, NA_COMPLEX); break;
-	case  STRSXP: ifelseRecursive(STRING_ELT, SET_STRING_ELT,  NA_STRING); break;
+	case  RAWSXP: IFELSE_ATOMIC(   Rbyte,     RAW,          0); break;
+	case  LGLSXP: IFELSE_ATOMIC(     int, LOGICAL, NA_LOGICAL); break;
+	case  INTSXP: IFELSE_ATOMIC(     int, INTEGER, NA_INTEGER); break;
+	case REALSXP: IFELSE_ATOMIC(  double,    REAL,    NA_REAL); break;
+	case CPLXSXP: IFELSE_ATOMIC(Rcomplex, COMPLEX, NA_COMPLEX); break;
+	case  STRSXP: IFELSE(STRING_ELT, SET_STRING_ELT,  NA_STRING); break;
 	case  VECSXP:
-	case EXPRSXP: ifelseRecursive(VECTOR_ELT, SET_VECTOR_ELT, R_NilValue); break;
+	case EXPRSXP: IFELSE(VECTOR_ELT, SET_VECTOR_ELT, R_NilValue); break;
 	}
-	UNPROTECT(3);
+	UNPROTECT(5);
 	return ans;
 }
