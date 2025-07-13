@@ -39,8 +39,11 @@ function (test, yes, no, na = NULL, maybeDotCall = FALSE)
     }
     ## Take care to dispatch methods for 'names', 'dim', 'dimnames'
     ## and the replacement functions:
-    names(ans) <- names(test)
-    dim(ans) <- dim(test)
-    dimnames(ans) <- dimnames(test)
+    if (is.null(d <- dim(test)))
+        names(ans) <- names(test)
+    else {
+        dim(ans) <- d
+        dimnames(ans) <- dimnames(test)
+    }
     ans
 }
