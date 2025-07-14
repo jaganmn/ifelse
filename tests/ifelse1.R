@@ -69,4 +69,36 @@ stopifnot(vapply(list(t4, y4, n4), typeof, "") == "S4",
           methods::is(ifelse1(t4, y4, n4), "dMatrix"),
           identical(methods::as(ifelse1(t4, y4, n4), "matrix"), vv))
 
-}) # using S4 classes and methods from package 'Matrix'
+})
+
+
+##  *-----------------------------------------------------------*
+##  |  Battery tests including maybeDotCall = TRUE ...          |
+##  *-----------------------------------------------------------*
+
+## Exclude raw vectors for now as '[<-' is minimally implemented.
+## Exclude complex vectors for now due to subassignment complication:
+##     https://bugs.r-project.org/show_bug.cgi?id=18918
+
+ifelse2 <- ifelse1
+formals(ifelse2)[["maybeDotCall"]] <- TRUE
+
+arg.types <- c(if (FALSE) "raw", "logical", "integer", "double",
+               if (FALSE) "complex", "character", "list", "expression")
+arg.lengths <- 0L:7L
+arg.values <- c(0L:255L, NA)
+set.seed(509693732L)
+for (i in seq_len(128L)) {
+    at <- sample(arg.types  , 4L, TRUE)
+    al <- sample(arg.lengths, 4L, TRUE)
+    if (at[1L] == "expression")
+        at[1L] <- "list" # as.logical(<expression>) is unimplemented
+    test <- as.vector(sample(c(FALSE, TRUE, NA), al[1L], TRUE), at[1L])
+    yes  <- as.vector(sample(        arg.values, al[2L], TRUE), at[2L])
+    no   <- as.vector(sample(        arg.values, al[3L], TRUE), at[3L])
+    na   <- as.vector(sample(        arg.values, al[4L], TRUE), at[4L])
+    stopifnot(identical(ifelse1(test, yes, no),
+                        ifelse2(test, yes, no)),
+              identical(ifelse1(test, yes, no, na),
+                        ifelse2(test, yes, no, na)))
+}
