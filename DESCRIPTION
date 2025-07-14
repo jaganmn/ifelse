@@ -17,3 +17,4 @@ Authors@R:
 Depends: R (>= 2.14)
 DependsNote: for Authors@R, almost surely not strict enough
 Imports: methods
+Suggests: Matrix
