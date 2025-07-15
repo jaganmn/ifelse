@@ -1,4 +1,3 @@
-#include <stdlib.h>
 #include <Rinternals.h>
 
 #ifndef NA_COMPLEX
