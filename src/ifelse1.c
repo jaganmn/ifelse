@@ -6,6 +6,7 @@ extern Rcomplex R_ifelse_NaComplex;
 # define NA_COMPLEX R_ifelse_NaComplex
 #endif
 
+#define _(String) (String)
 #define imax2(a, b)    ((a < b) ?       b     :       a    )
 #define imax3(a, b, c) ((a < b) ? imax2(b, c) : imax2(a, c))
 
@@ -13,16 +14,16 @@ SEXP R_ifelse_ifelse1(SEXP test, SEXP yes, SEXP no, SEXP na)
 {
 	int withna = na != R_NilValue;
 	if (!Rf_isLogical(test))
-		Rf_error("'%s' [type \"%s\"] is not logical",
+		Rf_error(_("'%s' [type \"%s\"] is not logical"),
 		         "test", Rf_type2char(TYPEOF(test)));
 	if (!Rf_isVector(yes))
-		Rf_error("'%s' [type \"%s\"] is not a vector",
+		Rf_error(_("'%s' [type \"%s\"] is not a vector"),
 		         "yes", Rf_type2char(TYPEOF(yes)));
 	if (!Rf_isVector(no))
-		Rf_error("'%s' [type \"%s\"] is not a vector",
+		Rf_error(_("'%s' [type \"%s\"] is not a vector"),
 		         "no", Rf_type2char(TYPEOF(no)));
 	if (withna && !Rf_isVector(na))
-		Rf_error("'%s' [type \"%s\"] is not a vector or NULL",
+		Rf_error(_("'%s' [type \"%s\"] is not a vector or NULL"),
 		         "na", Rf_type2char(TYPEOF(na)));
 	R_xlen_t nyes = XLENGTH(yes), nno = XLENGTH(no), \
 		nna = (withna) ? XLENGTH(na) : 0, nans = XLENGTH(test);
