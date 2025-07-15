@@ -34,9 +34,9 @@ attributes(tt) <- aa <-
 stopifnot(identical(ifelse (tt, 1, 0), `attributes<-`(vv, aa)),
           identical(ifelse1(tt, 1, 0), `attributes<-`(vv, aa[1L])))
 attributes(tt) <- aa <-
-    c(aa, list(dim = c(2L, 1L), dimnames = list(c("Aa", "Ab"), "Ba")))
+    c(list(dim = c(2L, 1L), dimnames = list(c("Aa", "Ab"), "Ba")), aa)
 stopifnot(identical(ifelse (tt, 1, 0), `attributes<-`(vv, aa)),
-          identical(ifelse1(tt, 1, 0), `attributes<-`(vv, aa[3L:4L])))
+          identical(ifelse1(tt, 1, 0), `attributes<-`(vv, aa[1L:3L])))
 
 
 ## Replacement of NA is supported
