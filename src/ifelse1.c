@@ -1,3 +1,4 @@
+#include <R_ext/Itermacros.h>
 #include <Rinternals.h>
 
 #ifndef NA_COMPLEX
@@ -25,31 +26,44 @@ SEXP R_ifelse_ifelse1(SEXP test, SEXP yes, SEXP no, SEXP na)
 		Rf_error(_("'%s' [type \"%s\"] is not a vector or NULL"),
 		         "na", Rf_type2char(TYPEOF(na)));
 	R_xlen_t nyes = XLENGTH(yes), nno = XLENGTH(no), \
-		nna = (withna) ? XLENGTH(na) : 0, nans = XLENGTH(test);
+		nna = (withna) ? XLENGTH(na) : 0, nans = XLENGTH(test),
+		jyes, jno, jna, jans;
 	SEXPTYPE tyes = TYPEOF(yes), tno = TYPEOF(no), \
 		tna = TYPEOF(na), tans = imax3(tyes, tno, tna);
 	SEXP ans = PROTECT(Rf_allocVector(tans, nans)),
 		dft = PROTECT(Rf_allocVector(tans, 1));
-	PROTECT(yes = (nyes) ? Rf_coerceVector(yes, tans) : dft);
-	PROTECT(no  = (nno ) ? Rf_coerceVector(no , tans) : dft);
-	PROTECT(na  = (nna ) ? Rf_coerceVector(na , tans) : dft);
+	PROTECT(yes = (nyes) ? Rf_coerceVector(yes, tans) : (nyes = 1, dft));
+	PROTECT(no  = (nno ) ? Rf_coerceVector(no , tans) : (nno  = 1, dft));
+	PROTECT(na  = (nna ) ? Rf_coerceVector(na , tans) : (nna  = 1, dft));
+	int mod = (nyes > 1 && nyes < nans) || (nno > 1 && nno < nans) ||
+		(nna > 1 && nna < nans);
 	const int *ptest = LOGICAL_RO(test);
 
 #define IFELSE(get, set, navalue) \
 	do { \
 		set(dft, 0, navalue); \
-		for (R_xlen_t j = 0; j < nans; ++j) \
-			set(ans, j, \
-			    (ptest[j] == NA_LOGICAL) \
-			    ? get(na , (nna  <= 1) ? 0 : j % nna ) : \
-			    (ptest[j]) \
-			    ? get(yes, (nyes <= 1) ? 0 : j % nyes) \
-			    : get(no , (nno  <= 1) ? 0 : j % nno )); \
+		if (mod) \
+		MOD_ITERATE3(nans, nyes, nno, nna, jans, jyes, jno, jna, \
+			set(ans, jans, \
+			    (ptest[jans] == NA_LOGICAL) \
+			    ? get(na , jna ) : \
+			    (ptest[jans]) \
+			    ? get(yes, jyes) \
+			    : get(no , jno )); ); \
+		else \
+		for (jans = 0; jans < nans; ++jans) \
+			set(ans, jans, \
+			    (ptest[jans] == NA_LOGICAL) \
+			    ? get(na , (nna  == 1) ? 0 : jans) : \
+			    (ptest[jans]) \
+			    ? get(yes, (nyes == 1) ? 0 : jans) \
+			    : get(no , (nno  == 1) ? 0 : jans)); \
 	} while (0)
 #define IFELSE_ATOMIC(type, ptr, navalue) \
 	do { \
-		type *pyes = ptr(yes), *pno = ptr(no), \
-			*pna = ptr(na), *pans = ptr(ans), *pdft = ptr(dft); \
+		const type *pyes = ptr##_RO(yes), *pno = ptr##_RO(no), \
+			*pna = ptr##_RO(na); \
+		type *pans = ptr(ans), *pdft = ptr(dft); \
 		IFELSE(ATOMIC_ELT, SET_ATOMIC_ELT, navalue); \
 	} while (0)
 #define     ATOMIC_ELT(x, i       ) p##x[i]
