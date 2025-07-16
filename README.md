@@ -17,4 +17,4 @@
 | `dimnames(value)` | `if (is.atomic(test)) dimnames(test) else NULL` | `dimnames(test)` | dimnames of longest argument | `if (length(no) == length(test)) dimnames(no) else NULL` | `NULL` | `NULL` |
 | other attributes | from `test` if atomic | from `c(yes, no)` | none | from `no` if `length(no) == length(test)` | from first of `yes`, `no` not identical to `NA` | from `yes` or `no` or both depending on coercions |
 | support for factors `yes`, `no` | none; uses integer representation | full; uses `levels(c(yes, no))` | full; uses `levels(c(yes, no))` | partial; requires identical `levels(.)` | partial; requires identical `levels(.)` | partial; requires identical `levels(.)` |
-| support for non-basic S4 classes | full; need suitable implementation | full; need suitable implementation | none | none | none | none |
+| support for non-basic S4 classes | full; classes need suitable implementation | full; classes need suitable implementation | none | none | none | none |
