@@ -13,12 +13,15 @@ function (ifelse, ..., r = 1024L)
 {
     list(...)
     cat(sprintf("ifelse = %s\n", deparse(substitute(ifelse))))
-    system.time(for (i in seq_len(r)) ifelse(...))
+    print(system.time(for (i in seq_len(r)) ifelse(...)))
 }
 
 st <-
 function (...)
 {
+    d <- nargs()
+    dn <- list(`Lengths:` = c("test", "yes", "no", "na")[seq_len(d)])
+    print(array(lengths(list(...)), dim = d, dimnames = dn))
     st.(      base:: ifelse, ...)
     st.(    ifelse::ifelse1, ...)
     st.(    ifelse::ifelse1, ..., maybeDotCall = TRUE)
@@ -28,19 +31,19 @@ function (...)
     st.(     dplyr::if_else, ...)
     if (requireNamespace("hutils"))
     st.(    hutils::if_else, ...)
-    if (requireNamespace("kit") && FALSE) # links OpenMP a second time
+    if (FALSE && requireNamespace("kit"))
     st.(       kit::    iif, ...)
+    ##
+    ## MJ: not eager to diagnose this error message right now ...
+    ##
+    ## OMP: Error #15:
+    ## Initializing libomp.a, but found libomp.a already initialized.
+    ##
+    cat("\n\n")
     invisible(NULL)
 }
 
-cat(sprintf("\n\n... %s yes no .......\n\n", "long"))
 st(test, j, j)
-
-cat(sprintf("\n\n... %s yes no .......\n\n", "short"))
 st(test, j[1L], j[1L])
-
-cat(sprintf("\n\n... %s yes no na .......\n\n", "long"))
 st(test, j, j, j)
-
-cat(sprintf("\n\n... %s yes no na .......\n\n", "short"))
 st(test, j[1L], j[1L], j[1L])
