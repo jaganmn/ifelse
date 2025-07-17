@@ -14,7 +14,7 @@ Authors@R:
 	         email = "jaganmn@mcmaster.ca",
 	         role = c("aut", "cre"),
 	         comment = c(ORCID = "0000-0002-3542-2938")))
-Depends: R (>= 3.1)
-DependsNote: R_ext/Itermacros.h
+Depends: R (>= 3.5)
+DependsNote: *_RO macros from Rinternals.h
 Imports: methods
 Suggests: Matrix
