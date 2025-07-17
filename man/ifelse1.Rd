@@ -38,7 +38,7 @@ ifelse1(test, yes, no, na = NULL, maybeDotCall = FALSE)
 }
 \seealso{\code{\link{if}}, \code{\link{ifelse}}.}
 \examples{
-## TODO
+## TODO, but see the tests in ../tests/ifelse1.R
 }
 \keyword{logic}
 \keyword{programming}
