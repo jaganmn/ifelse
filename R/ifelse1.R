@@ -23,12 +23,17 @@ function (test, yes, no, na = NULL, strict = NA)
     }
     if (!(is.object(yes) || is.object(no) || is.object(na)))
         return(.Call(R_ifelse_ifelse1, ltest, yes, no, na))
+    ## Get length-0 and length-1 *unnamed* vectors of the final type
+    ## and class.  For vector types, the latter is raw(1L) or NA or
+    ## NULL.
     dft0 <- `names<-`(c(yes[0L], no[0L], na[0L]), NULL)
     dft1 <- dft0[1L]
     if (ntest == 1L) {
+        ## Be fast here:
         tmp <- if (is.na(ltest)) na else if (ltest) yes else no
         ans <- if (length(tmp)) c(dft0, `names<-`(tmp[1L], NULL)) else dft1
     } else {
+        ## Avoid allocations by 'rep' wherever possible:
         ans <- rep(dft1, length.out = ntest)
         if ((n <- length(yes)) && length(j <- which(ltest)))
             ans[j] <- if (n == 1L) yes
@@ -43,8 +48,10 @@ function (test, yes, no, na = NULL, strict = NA)
                       else if (n >= ntest) na[j]
                       else rep(na, length.out = ntest)[j]
     }
-    ## Take care to dispatch methods for 'names', 'dim', 'dimnames'
-    ## and the replacement functions:
+    ## Take care to dispatch methods for 'names', 'dim', 'dimnames' and
+    ## the replacement functions and *not* rely on attributes which need
+    ## not exist.
+    ## > loadNamespace("Matrix"); names(attributes(new("lgeMatrix")))
     if (!is.null(a <- dim(test))) {
         dim(ans) <- a
         if (!is.null(a <- dimnames(test)))
