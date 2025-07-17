@@ -24,8 +24,8 @@ function (test, yes, no, na = NULL, strict = NA)
     if (!(is.object(yes) || is.object(no) || is.object(na)))
         return(.Call(R_ifelse_ifelse1, ltest, yes, no, na))
     ## Get length-0 and length-1 *unnamed* vectors of the final type
-    ## and class.  For vector types, the latter is raw(1L) or NA or
-    ## NULL.
+    ## and class.  For vector types, the latter is the nul byte or NA
+    ## or NULL.
     dft0 <- `names<-`(c(yes[0L], no[0L], na[0L]), NULL)
     dft1 <- dft0[1L]
     if (ntest == 1L) {
