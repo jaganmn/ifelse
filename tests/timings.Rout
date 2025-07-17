@@ -1,0 +1,87 @@
+[1] 5594556 5587272 5595388
+Lengths:
+    test      yes       no 
+16777216 16777216 16777216 
+ifelse = base::ifelse
+   user  system elapsed 
+198.519  26.356 224.978 
+ifelse = ifelse::ifelse1
+   user  system elapsed 
+174.984  16.829 191.814 
+ifelse = ifelse::ifelse1
+   user  system elapsed 
+ 18.766   3.670  22.436 
+ifelse = data.table::fifelse
+   user  system elapsed 
+ 18.518   3.686  22.204 
+ifelse = dplyr::if_else
+   user  system elapsed 
+416.449  35.700 452.244 
+ifelse = hutils::if_else
+   user  system elapsed 
+136.424  15.269 151.698 
+
+
+Lengths:
+    test      yes       no 
+16777216        1        1 
+ifelse = base::ifelse
+   user  system elapsed 
+205.802  26.111 232.037 
+ifelse = ifelse::ifelse1
+   user  system elapsed 
+139.939  12.237 152.164 
+ifelse = ifelse::ifelse1
+   user  system elapsed 
+ 18.377   3.400  21.776 
+ifelse = data.table::fifelse
+   user  system elapsed 
+ 18.493   3.510  22.002 
+ifelse = dplyr::if_else
+   user  system elapsed 
+405.085  32.094 437.248 
+ifelse = hutils::if_else
+   user  system elapsed 
+135.081  13.591 148.663 
+
+
+Lengths:
+    test      yes       no       na 
+16777216 16777216 16777216 16777216 
+ifelse = ifelse::ifelse1
+   user  system elapsed 
+260.238  23.319 283.538 
+ifelse = ifelse::ifelse1
+   user  system elapsed 
+ 18.729   3.443  22.170 
+ifelse = data.table::fifelse
+   user  system elapsed 
+ 14.264   3.441  17.704 
+ifelse = dplyr::if_else
+   user  system elapsed 
+420.471  32.605 453.047 
+ifelse = hutils::if_else
+    user   system  elapsed 
+ 200.456   21.931 1107.548 
+
+
+Lengths:
+    test      yes       no       na 
+16777216        1        1        1 
+ifelse = ifelse::ifelse1
+   user  system elapsed 
+209.709  20.121 229.886 
+ifelse = ifelse::ifelse1
+   user  system elapsed 
+ 18.592   3.610  22.200 
+ifelse = data.table::fifelse
+   user  system elapsed 
+ 14.269   3.514  17.782 
+ifelse = dplyr::if_else
+   user  system elapsed 
+401.521  34.189 435.701 
+ifelse = hutils::if_else
+   user  system elapsed 
+134.752  14.576 149.321 
+
+
