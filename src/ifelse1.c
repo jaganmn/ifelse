@@ -79,6 +79,18 @@ SEXP R_ifelse_ifelse1(SEXP test, SEXP yes, SEXP no, SEXP na)
 	case  VECSXP:
 	case EXPRSXP: IFELSE(VECTOR_ELT, SET_VECTOR_ELT, R_NilValue); break;
 	}
-	UNPROTECT(5);
+	SEXP a;
+	PROTECT(a = Rf_getAttrib(test, R_NamesSymbol));
+	if (a != R_NilValue)
+		Rf_setAttrib(ans, R_NamesSymbol, a);
+	PROTECT(a = Rf_getAttrib(test, R_DimSymbol));
+	if (a != R_NilValue) {
+		Rf_setAttrib(ans, R_DimSymbol, a);
+		PROTECT(a = Rf_getAttrib(test, R_DimNamesSymbol));
+		if (a != R_NilValue)
+			Rf_setAttrib(ans, R_DimNamesSymbol, a);
+		UNPROTECT(1);
+	}
+	UNPROTECT(7);
 	return ans;
 }

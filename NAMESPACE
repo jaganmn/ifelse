@@ -1,2 +1,3 @@
 useDynLib(ifelse, .registration = TRUE)
 export(ifelse1)
+export(.ifelse1)

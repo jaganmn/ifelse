@@ -1,30 +1,43 @@
 \name{ifelse1}
 \alias{ifelse1}
+\alias{.ifelse1}
 \title{\sQuote{ifelse} Variants: Option 1}
 \description{
-  A variant of function \code{\link{ifelse}} in package \pkg{base},
-  cleaning up behaviours of that function that seem to violate the
-  \href{principle of least surprise}{
+  \code{ifelse1} is a variant of function \code{\link{ifelse}} in
+  package \pkg{base}, cleaning up behaviours of that function that seem
+  to violate the \href{principle of least surprise}{
 	https://en.wikipedia.org/wiki/Principle_of_least_astonishment}
   and supporting replacement of \code{NA}.
+
+  \code{.ifelse1} is a lower level interface with more restrictions on
+  the arguments, intended to be faster for the most frequent usage of
+  \code{ifelse1}, that in which none of the arguments have class
+  attributes.
+
   Prompted by renewed discussion in the R-devel mailing list:
   \url{https://stat.ethz.ch/pipermail/r-devel/2025-July/084096.html}
 }
 \usage{
-ifelse1(test, yes, no, na = NULL, maybeDotCall = FALSE)
+ ifelse1(test, yes, no, na = NULL, strict = NA)
+.ifelse1(test, yes, no, na = NULL)
 }
 \arguments{
-  \item{test}{an object coercible to logical.}
+  \item{test}{an object coercible to logical.  For \code{.ifelse1}, it
+    must have logical type.}
   \item{yes, no, na}{vectors (more generally, objects with suitable
     methods for generic functions \code{\link{rep}},
     \code{\link{length}}, \code{\link{c}}, \code{\link{[}}, and
     \code{\link{[<-}}) containing return values for \code{TRUE},
-    \code{FALSE}, and \code{NA} elements of \code{test}.
-    \code{NA} are preserved by default for consistency with
-    \code{\link{ifelse}}.}
-  \item{maybeDotCall}{a logical indicating if a \proglang{C}
-    implementation should be used when \code{yes} and \code{no} do not
-    have class attributes.}
+    \code{FALSE}, and \code{NA} elements of \code{test}.  For
+    consistency with \code{\link{ifelse}}, \code{NA} elements of
+    \code{test} are by default not replaced.  Arguments are recycled if
+    necessary (and permitted by \code{strict}) to the length of
+    \code{test}.  For \code{.ifelse1}, they must have a \link{vector}
+    type.}
+  \item{strict}{a logical indicating if a warning (\code{strict = NA})
+    or error (\code{strict = TRUE}) should be signaled if any of
+    \code{yes}, \code{no}, and (if not \code{NULL}) \code{na} has length
+    not equal to 1 or \code{length(test)}.}
 }
 \value{
   A vector.  The length is the length of \code{test} after coercion to
