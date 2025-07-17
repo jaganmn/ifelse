@@ -3,10 +3,7 @@ set.seed(1790681255L)
 
 n <- 0x1p+24L
 j <- sample(0L:255L, n, TRUE)
-
-l3 <- c(FALSE, TRUE, NA)
-test <- sample(l3, n, TRUE)
-tabulate(factor(test, levels = l3, exclude = NULL), 3L)
+test <- sample(c(FALSE, TRUE, NA), n, TRUE)
 
 st. <-
 function (ifelse, ..., r = 1024L)
