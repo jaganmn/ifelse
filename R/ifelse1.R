@@ -23,17 +23,12 @@ function (test, yes, no, na = NULL, strict = FALSE)
     }
     if (!(is.object(yes) || is.object(no) || is.object(na)))
         return(.Call(R_ifelse_ifelse1, ltest, yes, no, na))
-    ## Get length-0 and length-1 *unnamed* vectors of the final type
-    ## and class.  For vector types, the latter is the nul byte or NA
-    ## or NULL.
-    dft0 <- `names<-`(c(yes[0L], no[0L], na[0L]), NULL)
-    dft1 <- dft0[1L]
+    dft <- `names<-`(c(yes[0L], no[0L], na[0L]), NULL)
     if (ntest == 1L) {
-        ## Be fast here:
         tmp <- if (is.na(ltest)) na else if (ltest) yes else no
-        ans <- if (length(tmp)) c(dft0, `names<-`(tmp[1L], NULL)) else dft1
+        ans <- if (length(tmp)) c(dft, `names<-`(tmp[1L], NULL)) else dft[1L]
     } else {
-        ans <- dft0[seq_len(ntest)]
+        ans <- dft[seq_len(ntest)]
         if ((n <- length(yes)) && length(j <- which(ltest)))
             ans[j] <- if (n == 1L) yes
                       else if (n >= ntest) yes[j]
