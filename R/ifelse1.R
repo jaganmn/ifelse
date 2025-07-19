@@ -23,12 +23,29 @@ function (test, yes, no, na = NULL, strict = FALSE)
     }
     if (!(is.object(yes) || is.object(no) || is.object(na)))
         return(.Call(R_ifelse_ifelse1, ltest, yes, no, na))
+    ## At least one of 'yes', 'no', 'na' has a class attribute, and we
+    ## expect the following:
+    ##
+    ## [1] That 'c' works for class(yes).
+    ## [2] That '[', 'length' work for class(yes), class(no), class(na).
+    ## [3] That '[<-' works for class(c(yes[0L], no[0L], na[0L])).
+    ## [4] That non-NULL names(x) implies that 'names<-' works for
+    ##     class(x); ditto for 'dim' and 'dimnames'.
+    ## [5] That x[0L][1L] is the canonical "missing value" for class(x).
+    ##
+    ## A known limitation is that '[' and 'c' may not preserve the class
+    ## of time series objects.  '[<-' with missing subscript provides a
+    ## simple work-around:
+    ## > x <- ts(-1:1); y <- ifelse1(x == 0, x, x)
+    ## > stopifnot(identical(x, `[<-`(x, y)), identical(y, as.vector(x)))
     dft <- `names<-`(c(yes[0L], no[0L], na[0L]), NULL)
     if (ntest == 1L) {
         tmp <- if (is.na(ltest)) na else if (ltest) yes else no
         ans <- if (length(tmp)) c(dft, `names<-`(tmp[1L], NULL)) else dft[1L]
     } else {
         ans <- dft[seq_len(ntest)]
+        ## NOT: `length<-`(dft, ntest)       # as needs 'length<-'
+        ## NOT: rep(dft, length.out = ntest) # as needs 'rep'
         if ((n <- length(yes)) && length(j <- which(ltest)))
             ans[j] <- if (n == 1L) yes
                       else if (n >= ntest) yes[j]
@@ -42,9 +59,9 @@ function (test, yes, no, na = NULL, strict = FALSE)
                       else if (n >= ntest) na[j]
                       else na[1L + (j - 1L) %% n]
     }
-    ## Take care to dispatch methods for 'names', 'dim', 'dimnames' and
-    ## the replacement functions and *not* rely on attributes which need
-    ## not exist.
+    ## We take care to dispatch methods for 'names', 'dim', 'dimnames'
+    ## and the replacement functions and *not* rely on attributes which
+    ## need not exist.
     ## > loadNamespace("Matrix"); names(attributes(new("lgeMatrix")))
     if (!is.null(a <- dim(test))) {
         dim(ans) <- a
