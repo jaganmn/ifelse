@@ -3,7 +3,7 @@ function (test, yes, no, na = NULL)
     .Call(R_ifelse_ifelse1, test, yes, no, na)
 
 ifelse1 <-
-function (test, yes, no, na = NULL, strict = NA)
+function (test, yes, no, na = NULL, strict = FALSE)
 {
     ltest <-
         if (is.logical(test) && !is.object(test))

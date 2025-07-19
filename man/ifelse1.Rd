@@ -18,7 +18,7 @@
   \url{https://stat.ethz.ch/pipermail/r-devel/2025-July/084096.html}
 }
 \usage{
- ifelse1(test, yes, no, na = NULL, strict = NA)
+ ifelse1(test, yes, no, na = NULL, strict = FALSE)
 .ifelse1(test, yes, no, na = NULL)
 }
 \arguments{
@@ -37,7 +37,8 @@
   \item{strict}{a logical indicating if a warning (\code{strict = NA})
     or error (\code{strict = TRUE}) should be signaled if any of
     \code{yes}, \code{no}, and (if not \code{NULL}) \code{na} has length
-    not equal to 1 or \code{length(test)}.}
+    not equal to 1 or \code{length(test)}.  By default, recycling
+    happens silently.}
 }
 \value{
   A vector.  The length is the length of \code{test} after coercion to
