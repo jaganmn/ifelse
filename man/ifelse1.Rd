@@ -25,9 +25,9 @@
   \item{test}{an object coercible to logical.  For \code{.ifelse1}, it
     must have logical type.}
   \item{yes, no, na}{vectors (more generally, objects with suitable
-    methods for generic functions \code{\link{rep}},
-    \code{\link{length}}, \code{\link{c}}, \code{\link{[}}, and
-    \code{\link{[<-}}) containing return values for \code{TRUE},
+    methods for generic functions \code{\link{[}}, \code{\link{[<-}},
+    \code{\link{c}}, and \code{\link{length}} or for which the internal
+    default methods work) containing return values for \code{TRUE},
     \code{FALSE}, and \code{NA} elements of \code{test}.  For
     consistency with \code{\link{ifelse}}, \code{NA} elements of
     \code{test} are by default not replaced.  Arguments are recycled if

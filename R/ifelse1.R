@@ -33,20 +33,19 @@ function (test, yes, no, na = NULL, strict = NA)
         tmp <- if (is.na(ltest)) na else if (ltest) yes else no
         ans <- if (length(tmp)) c(dft0, `names<-`(tmp[1L], NULL)) else dft1
     } else {
-        ## Avoid allocations by 'rep' wherever possible:
-        ans <- rep(dft1, length.out = ntest)
+        ans <- dft0[seq_len(ntest)]
         if ((n <- length(yes)) && length(j <- which(ltest)))
             ans[j] <- if (n == 1L) yes
                       else if (n >= ntest) yes[j]
-                      else rep(yes, length.out = ntest)[j]
+                      else yes[1L + (j - 1L) %% n]
         if ((n <- length(no)) && length(j <- which(!ltest)))
             ans[j] <- if (n == 1L) no
                       else if (n >= ntest) no[j]
-                      else rep(no, length.out = ntest)[j]
+                      else no[1L + (j - 1L) %% n]
         if ((n <- length(na)) && length(j <- which(is.na(ltest))))
             ans[j] <- if (n == 1L) na
                       else if (n >= ntest) na[j]
-                      else rep(na, length.out = ntest)[j]
+                      else na[1L + (j - 1L) %% n]
     }
     ## Take care to dispatch methods for 'names', 'dim', 'dimnames' and
     ## the replacement functions and *not* rely on attributes which need
