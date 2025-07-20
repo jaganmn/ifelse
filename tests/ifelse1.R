@@ -94,6 +94,7 @@ for (i in seq_len(128L)) {
     yes  <- as.vector(sample(        arg.values, al[2L], TRUE), at[2L])
     no   <- as.vector(sample(        arg.values, al[3L], TRUE), at[3L])
     na   <- as.vector(sample(        arg.values, al[4L], TRUE), at[4L])
+    class(yes) <- "zzz" # so that ifelse1 does not use .Call
     stopifnot(identical( ifelse1(test, yes, no, strict = FALSE),
                         .ifelse1(test, yes, no)),
               identical( ifelse1(test, yes, no, na, strict = FALSE),

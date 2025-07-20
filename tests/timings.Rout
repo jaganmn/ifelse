@@ -3,22 +3,22 @@ Lengths:
 16777216 16777216 16777216 
 ifelse = base::ifelse
    user  system elapsed 
-203.339  26.382 229.762 
+203.968  25.747 229.763 
 ifelse = ifelse::ifelse1
    user  system elapsed 
- 18.802   3.675  22.496 
+185.609  19.400 205.007 
 ifelse = ifelse::.ifelse1
    user  system elapsed 
- 18.907   3.535  22.443 
+ 18.643   3.547  22.189 
 ifelse = data.table::fifelse
    user  system elapsed 
- 18.376   3.673  22.049 
+ 18.498   3.702  22.199 
 ifelse = dplyr::if_else
    user  system elapsed 
-414.245  34.174 448.438 
+621.345 101.584 722.935 
 ifelse = hutils::if_else
    user  system elapsed 
-134.862  14.759 149.615 
+135.191  14.452 149.647 
 
 
 Lengths:
@@ -26,22 +26,22 @@ Lengths:
 16777216        1        1 
 ifelse = base::ifelse
    user  system elapsed 
-202.839  26.286 229.115 
+201.867  24.477 226.332 
 ifelse = ifelse::ifelse1
    user  system elapsed 
- 18.732   3.801  22.532 
+156.727  16.128 172.847 
 ifelse = ifelse::.ifelse1
    user  system elapsed 
- 18.560   3.791  22.350 
+ 18.381   3.619  21.999 
 ifelse = data.table::fifelse
    user  system elapsed 
- 18.549   3.659  22.207 
+ 18.632   3.529  22.173 
 ifelse = dplyr::if_else
    user  system elapsed 
-400.574  33.526 434.079 
+615.203 102.745 717.964 
 ifelse = hutils::if_else
    user  system elapsed 
-134.700  13.694 148.388 
+134.169  13.752 147.913 
 
 
 Lengths:
@@ -49,19 +49,19 @@ Lengths:
 16777216 16777216 16777216 16777216 
 ifelse = ifelse::ifelse1
    user  system elapsed 
- 18.897   3.540  22.441 
+270.313  27.161 297.460 
 ifelse = ifelse::.ifelse1
    user  system elapsed 
- 18.626   3.650  22.275 
+ 18.450   3.595  22.042 
 ifelse = data.table::fifelse
    user  system elapsed 
- 14.115   3.556  17.671 
+ 14.016   3.617  17.632 
 ifelse = dplyr::if_else
    user  system elapsed 
-422.859  34.526 457.325 
+633.210 102.419 735.979 
 ifelse = hutils::if_else
    user  system elapsed 
-204.782  22.907 227.680 
+203.325  22.351 225.661 
 
 
 Lengths:
@@ -69,18 +69,18 @@ Lengths:
 16777216        1        1        1 
 ifelse = ifelse::ifelse1
    user  system elapsed 
- 18.315   3.816  22.129 
+220.718  23.930 244.657 
 ifelse = ifelse::.ifelse1
    user  system elapsed 
- 18.453   3.815  22.266 
+ 18.281   3.588  21.868 
 ifelse = data.table::fifelse
    user  system elapsed 
- 14.063   3.482  17.545 
+ 14.163   3.442  17.604 
 ifelse = dplyr::if_else
    user  system elapsed 
-401.370  34.548 435.914 
+623.681  96.689 720.395 
 ifelse = hutils::if_else
    user  system elapsed 
-134.546  14.171 148.745 
+134.294  13.963 148.231 
 
 

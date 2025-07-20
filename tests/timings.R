@@ -2,8 +2,10 @@ Sys.setenv(OMP_THREAD_LIMIT = "1")
 set.seed(1790681255L)
 
 n <- 0x1p+24L
-j <- sample(0L:255L, n, TRUE)
+jn <- sample(0L:255L, n, TRUE); j1 <- jn[1L]
 test <- sample(c(FALSE, TRUE, NA), n, TRUE)
+class(jn) <- class(j1) <-
+    "zzz" # so that ifelse1 does not use .Call
 
 st. <-
 function (ifelse, ..., r = 1024L)
@@ -41,7 +43,7 @@ function (...)
     invisible(NULL)
 }
 
-st(test, j, j)
-st(test, j[1L], j[1L])
-st(test, j, j, j)
-st(test, j[1L], j[1L], j[1L])
+st(test, jn, jn)
+st(test, j1, j1)
+st(test, jn, jn, jn)
+st(test, j1, j1, j1)
