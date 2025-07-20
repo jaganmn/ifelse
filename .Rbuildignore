@@ -1,5 +1,7 @@
 ^README[.]md$
 ^tests/timings[.]R$
-^tests/timings[.]Rout$
+[.]Rout$
 [.]diff$
+[.]orig$
 [.]patch$
+[.]rej$

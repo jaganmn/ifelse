@@ -1,6 +1,6 @@
 Package: ifelse
 Version: 0.0.1
-Date: 2025-07-19
+Date: 2025-07-20
 Title: 'ifelse' Variants
 Description:
 	Experiments with variants of function 'ifelse' in package 'base'
@@ -17,4 +17,4 @@ Authors@R:
 Depends: R (>= 3.5)
 DependsNote: *_RO macros from Rinternals.h
 Imports: methods
-Suggests: Matrix
+Suggests: Matrix, Rmpfr, zoo
