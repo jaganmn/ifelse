@@ -29,15 +29,15 @@ function (test, yes, no, na = NULL, strict = FALSE)
     ## [1] That 'c' works for class(yes).
     ## [2] That '[', 'length' work for class(yes), class(no), class(na).
     ## [3] That '[<-' works for class(c(yes[0L], no[0L], na[0L])).
-    ## [4] That non-NULL names(x) implies that 'names<-' works for
-    ##     class(x); ditto for 'dim' and 'dimnames'.
-    ## [5] That x[0L][1L] is the canonical "missing value" for class(x).
+    ## [4] That x[0L][1L] is the canonical "missing value" for class(x).
     ##
     ## A known limitation is that '[' and 'c' may not preserve the class
     ## of time series objects.  '[<-' with missing subscript provides a
     ## simple work-around:
+    ##
     ## > x <- ts(-1:1); y <- ifelse1(x == 0, x, x)
     ## > stopifnot(identical(x, `[<-`(x, y)), identical(y, as.vector(x)))
+    ##
     dft <- `names<-`(c(yes[0L], no[0L], na[0L]), NULL)
     if (ntest == 1L) {
         tmp <- if (is.na(ltest)) na else if (ltest) yes else no
@@ -62,8 +62,19 @@ function (test, yes, no, na = NULL, strict = FALSE)
     ## We take care to dispatch methods for 'names', 'dim', 'dimnames'
     ## and the replacement functions and *not* rely on attributes which
     ## need not exist.
+    ##
     ## > loadNamespace("Matrix"); names(attributes(new("lgeMatrix")))
-    if (!is.null(a <- dim(test))) {
+    ##
+    ## We must work around missing dim<-.POSIXlt, dimnames<-.POSIXlt.
+    ## The internal default method does not do the right thing!
+    ##
+    ## > `dim<-`(as.POSIXlt(.POSIXct(0)),  1L)
+    ## > `dim<-`(as.POSIXlt(.POSIXct(0)), 11L)
+    ##
+    ## Indeed, we expect implicitly that the replacement functions work
+    ## for class(ans).
+    ##
+    if (!is.null(a <- dim(test)) && !inherits(ans, "POSIXlt")) {
         dim(ans) <- a
         if (!is.null(a <- dimnames(test)))
             dimnames(ans) <- a
