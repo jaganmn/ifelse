@@ -143,9 +143,9 @@ stopifnot(vapply(list(t4, v4, m4), typeof, "") == "S4",
           ## Return value is based on c(yes[0], no[0])
           ## (dsparseVector or traditional double vector):
           identical(ifelse1(t4, v4, v4),
-                    print(`dim<-`(          v4 , dim(test)))),
+                    print(`dimnames<-`(`dim<-`(          v4 , dim(t4)), dimnames(t4)))),
           identical(ifelse1(t4, m4, m4),
-                    print(`dim<-`(as.vector(m4), dim(test)))))
+                    print(`dimnames<-`(`dim<-`(as.vector(m4), dim(t4)), dimnames(t4)))))
 
 })
 
