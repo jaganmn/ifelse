@@ -1,6 +1,6 @@
 Package: ifelse
 Version: 0.0.1
-Date: 2025-07-20
+Date: 2025-07-22
 Title: 'ifelse' Variants
 Description:
 	Experiments with variants of function 'ifelse' in package 'base'

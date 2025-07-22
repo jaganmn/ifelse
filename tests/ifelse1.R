@@ -9,20 +9,92 @@ stopifnot(identical(x, 1L), identical(y, "no"))
 
 
 ## The type and class of the return value do not depend on 'test',
-## are the type and class of c(yes, no, na)
-.A <- function(x) `class<-`(x, "A")
+## are the type and class of c(yes[0], no[0], na[0])
+.new <- function (x) NULL
+.methods <- list("[" = function (x, i, j, ..., drop = FALSE) NULL,
+                 "[<-" = function (x, i, j, ..., value) NULL,
+                 "c" = function (...) NULL)
+for (.class in c("A", "B")) {
+    body(.new) <-
+        substitute(`class<-`(x, .CLASS),
+                   list(.CLASS = .class))
+    assign(paste0(".", .class), .new)
+    for (.generic in names(.methods)) {
+        body(.methods[[.generic]]) <-
+            substitute(`class<-`(NextMethod(.GENERIC), .CLASS),
+                       list(.GENERIC = .generic, .CLASS = .class))
+        .S3method(.generic, .class, .methods[[.generic]])
+    }
+}
+.A
+getS3method("["  , "A")
+getS3method("[<-", "A")
+getS3method("c"  , "A")
 stopifnot(identical(ifelse (FALSE, 1L, 0), 0 ),
           identical(ifelse ( TRUE, 1L, 0), 1L),
           identical(ifelse1(FALSE, 1L, 0), 0 ),
           identical(ifelse1( TRUE, 1L, 0), 1 ),
-          identical(ifelse (.A(FALSE), .Date(1L), 0),    .A(0 )),
-          identical(ifelse (.A( TRUE), .Date(1L), 0),    .A(1L)),
-          identical(ifelse1(.A(FALSE), .Date(1L), 0), .Date(0 )),
-          identical(ifelse1(.A( TRUE), .Date(1L), 0), .Date(1 )),
-          identical(ifelse (.A(FALSE), 1L, .Date(0)),    .A(0 )),
-          identical(ifelse (.A( TRUE), 1L, .Date(0)),    .A(1L)),
-          identical(ifelse1(.A(FALSE), 1L, .Date(0)),       0  ),
-          identical(ifelse1(.A( TRUE), 1L, .Date(0)),       1  ))
+          identical(ifelse (.A(FALSE), .B(1L), 0), .A(0 )),
+          identical(ifelse (.A( TRUE), .B(1L), 0), .A(1L)),
+          identical(ifelse1(.A(FALSE), .B(1L), 0), .B(0 )),
+          identical(ifelse1(.A( TRUE), .B(1L), 0), .B(1 )),
+          identical(ifelse (.A(FALSE), 1L, .B(0)), .A(0 )),
+          identical(ifelse (.A( TRUE), 1L, .B(0)), .A(1L)),
+          identical(ifelse1(.A(FALSE), 1L, .B(0)),    0  ),
+          identical(ifelse1(.A( TRUE), 1L, .B(0)),    1  ))
+
+
+## As above but with classes from 'base', some with additional
+## attributes to be reconciled ...
+identicalPOSIXlt <- function (x, y, ...) {
+    if (getRversion() >= "4.3.0" &&
+        inherits(x, "POSIXlt") && inherits(y, "POSIXlt"))
+        identical(balancePOSIXlt(x), balancePOSIXlt(y), ...)
+    else identical(x, y, ...)
+}
+identicalIfElse <- function (yes, no = yes)
+    identicalPOSIXlt(ifelse1(yes == yes[1L], yes, no), c(yes, no[0L])) &&
+    identicalPOSIXlt(ifelse1( no ==  no[1L], no, yes), c(no, yes[0L]))
+L <-
+list(D   <- as.Date(seq(-1, 1, 0.5)),
+     Pc0 <- as.POSIXct(D, tz = "UTC"),
+     PcT <- as.POSIXct(D, tz = "America/Toronto"), # platform dependent
+     Pl0 <- as.POSIXlt(Pc0),
+     PlT <- as.POSIXlt(PcT),
+     Pds <- difftime(Pc0 + -2:2, Pc0, units = "secs"),
+     Pdh <- difftime(Pc0 + -2:2, Pc0, units = "hours"),
+     fAa  <- factor(c("A", "a", NA)),
+     fBb  <- factor(c("B", "b", NA)))
+stopifnot(all(vapply(L, identicalIfElse, FALSE)),
+          ## reconciliation of attributes is consistent with:
+          ## c.POSIXct
+          identicalIfElse(Pc0, PcT),
+          ## c.POSIXlt
+          if (getRversion() >= "4.6.0" &&
+              as.integer(R.version[["svn rev"]]) >= 88441L)
+          identicalIfElse(Pl0, PlT)
+          else
+          TRUE,
+          ## c.difftime
+          identicalIfElse(Pds, Pdh),
+          ## c.factor (special as levels are *merged*)
+          identical(ifelse1(fAa == fAa[1L], fAa, fBb),
+                    c(fAa[1L], fBb[2L], as.factor(NA_integer_))),
+          identical(ifelse1(fBb == fBb[1L], fBb, fAa),
+                    c(fBb[1L], fAa[2L], as.factor(NA_integer_))))
+
+
+## Now with time series objects, for which methods for '[', 'c'
+## (correctly) do *not* keep the class ...
+xt <- ts(-2:2)
+stopifnot(identical(          ifelse (xt == 0, xt, xt) ,           xt ),
+          ## ^because the return value is based on 'test'
+          identical(          ifelse1(xt == 0, xt, xt) , as.vector(xt)),
+          ## ^because the return value is based on c(yes[0], no[0])
+          identical(`[<-`(xt, ifelse1(xt == 0, xt, xt)),           xt )
+          ## ^get "old style" behaviour explicitly by subassigning
+          ##  the return value to an object of the desired class
+          )
 
 
 ## Attributes of 'test' are discarded, with the exceptions of
@@ -40,11 +112,11 @@ stopifnot(identical(ifelse (tt, 1, 0), `attributes<-`(vv, aa)),
 
 
 ## Replacement of NA is supported
-tt <- c(FALSE, TRUE, NA)
-vv <- c(0, 1, NA)
-stopifnot(identical(ifelse (tt, 1, 0), vv),
-          identical(ifelse1(tt, 1, 0), vv),
-          identical(ifelse1(tt, 1, 0, 0), replace(vv, is.na(tt), 0)))
+tt <- rep(c(FALSE, TRUE, NA), each = 2L)
+vv <- seq_along(tt); vv. <- replace(vv, is.na(tt), NA)
+stopifnot(identical(ifelse (tt, 3:4, 1:2), vv.),
+          identical(ifelse1(tt, 3:4, 1:2), vv.),
+          identical(ifelse1(tt, 3:4, 1:2, 5:6), vv))
 
 
 ## is.factor(test) is handled correctly
@@ -53,21 +125,27 @@ stopifnot(inherits(tryCatch(ifelse(tt, 1, 0), error = identity), "error"),
           identical(ifelse1(tt, 1, 0), ifelse1(as.logical(tt), 1, 0)))
 
 
-## S4 objects of type "S4" are handled generically (!)
+## S4 objects of type "S4" are handled generically
 if (requireNamespace("Matrix", quietly = TRUE)) withAutoprint({
 
 ( t4 <- new("lgeMatrix",
             Dim = c(2L, 2L),
             Dimnames = list(c("Aa", "Ab"), c("Ba", "Bb")),
-            x = c(FALSE, TRUE, NA, NA)) )
-( y4 <- new("dsparseVector", length = 4L, i = c(3L, 4L), x = c(3, 4)) )
-( n4 <- new("dgRMatrix", Dim = c(1L, 4L), p = c(0L, 1L), j = 0L, x = 1) )
-( vv <- array(c(1, 0, NA, NA), dim = dim(t4), dimnames = dimnames(t4)) )
+            x = c(FALSE, TRUE, TRUE, TRUE)) )
+( v4 <- new("dsparseVector", length = 4L, i = c(3L, 4L), x = c(3, 4)) )
+( m4 <- new("dgRMatrix", Dim = c(1L, 4L), p = c(0L, 1L), j = 0L, x = 1) )
 
-stopifnot(vapply(list(t4, y4, n4), typeof, "") == "S4",
-          identical(ifelse(t4, y4, n4), as.vector(vv)),
-          methods::is(ifelse1(t4, y4, n4), "dMatrix"),
-          identical(methods::as(ifelse1(t4, y4, n4), "matrix"), vv))
+stopifnot(vapply(list(t4, v4, m4), typeof, "") == "S4",
+          ## Return value is based on 'test'
+          ## (lgeMatrix) *after* coercion to logical:
+          identical(ifelse (t4, v4, v4), print(as.vector(v4))),
+          identical(ifelse (t4, m4, m4), print(as.vector(m4))),
+          ## Return value is based on c(yes[0], no[0])
+          ## (dsparseVector or traditional double vector):
+          identical(ifelse1(t4, v4, v4),
+                    print(`dim<-`(          v4 , dim(test)))),
+          identical(ifelse1(t4, m4, m4),
+                    print(`dim<-`(as.vector(m4), dim(test)))))
 
 })
 
@@ -77,11 +155,11 @@ stopifnot(vapply(list(t4, y4, n4), typeof, "") == "S4",
 ## *---------------------------------------------------------------*
 
 ## Exclude raw vectors for now as '[<-' is minimally implemented.
-## Exclude complex vectors for now due to subassignment complication:
-##     https://bugs.r-project.org/show_bug.cgi?id=18918
 
 arg.types <- c(if (FALSE) "raw", "logical", "integer", "double",
-               if (FALSE) "complex", "character", "list", "expression")
+               if (getRversion() >= "4.6.0" &&
+                   as.integer(R.version[["svn rev"]]) >= 88444L) "complex",
+               "character", "list", "expression")
 arg.lengths <- 0L:7L
 arg.values <- c(0L:255L, NA)
 set.seed(509693732L)
