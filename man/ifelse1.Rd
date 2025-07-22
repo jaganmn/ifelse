@@ -43,9 +43,9 @@
 \value{
   A vector.  The length is the length of \code{test} after coercion to
   logical.  The type and class are what would be the type and class of
-  \code{c(yes, no, na)}, hence coercions occur according to methods for
-  \code{\link{c}} (which dispatch on and hence may give precedence to
-  the class of the first argument \code{yes}).  The \code{\link{names}},
+  \code{c(yes[0], no[0], na[0])}, hence coercions occur according to
+  methods for \code{\link{c}} (which dispatch on and hence may give
+  precedence to the class of \code{yes[0]}).  The \code{\link{names}},
   \code{\link{dim}}, and \code{\link{dimnames}} of \code{test} are
   preserved.  Attributes of \code{test} other than \code{names},
   \code{dim}, and \code{dimnames} are discarded.
