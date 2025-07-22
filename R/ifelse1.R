@@ -68,8 +68,9 @@ function (test, yes, no, na = NULL, strict = FALSE)
     ## We must work around missing dim<-.POSIXlt, dimnames<-.POSIXlt.
     ## The internal default method does not do the right thing!
     ##
-    ## > `dim<-`(as.POSIXlt(.POSIXct(0)),  1L)
-    ## > `dim<-`(as.POSIXlt(.POSIXct(0)), 11L)
+    ## > x <- as.POSIXlt(.POSIXct(0, "UTC"))
+    ## > `dim<-`(x, length(        x ))
+    ## > `dim<-`(x, length(unclass(x)))
     ##
     ## Indeed, we expect implicitly that the replacement functions work
     ## for class(ans).
