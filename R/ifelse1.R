@@ -12,11 +12,18 @@ function (test, yes, no, na = NULL, strict = FALSE)
             methods::as(test, "logical")
         else as.logical(test)
     ntest <- length(ltest)
+    n <- c(length(yes), length(no), if (is.null(na)) 1L else length(na))
     if (is.na(strict) || strict) {
-        n <- c(length(yes), length(no), if (is.null(na)) 1L else length(na))
         if (length(k <- which(n != 1L & n != ntest)))
             (if (is.na(strict)) warning else stop)(
-                gettextf("length(%s) [%.0f] not equal to 1 or length(%s) [%.0f]",
+                gettextf("length of '%s' [%.0f] is not equal to %d or the length of '%s' [%.0f]",
+                         c("yes", "no", "na")[k[1L]], n[k[1L]], 1L,
+                         "test", ntest),
+                domain = NA)
+    } else {
+        if (ntest > 0L && length(k <- which(n == 0L | ntest %% n)))
+            warning(
+                gettextf("length of '%s' [%.0f] is not a submultiple of the length of '%s' [%.0f]",
                          c("yes", "no", "na")[k[1L]], n[k[1L]],
                          "test", ntest),
                 domain = NA)
