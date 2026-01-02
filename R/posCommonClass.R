@@ -10,7 +10,7 @@ function (args) {
         cx <- class(x)
         if (length(args) >= 2L)
             for (i in 2L:length(args)) {
-                y <- dots[[i]]
+                y <- args[[i]]
                 if (isa(y, cx))
                     next
                 else if (isa(x, cy <- class(y))) {
